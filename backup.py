@@ -1,23 +1,32 @@
 import os
 
-# def dirls(x):
-#     if x:
-#         a=os.listdir(x)
-#         #dirls(x[0)
-#     return(a)
-# 
+def dirls(pdir):
+    if pdir:
+        ldir=os.listdir(pdir)
+        for i, j in enumerate(ldir):
+            if os.path.isdir(os.path.join(pdir,j)):
+                ldir[i]=os.path.join(pdir,j)
+            else: 
+                ldir.pop[i]
+    #print(ldir[0])
+    #dirls(ldir[0])
+    
 
-def dirls(x):
-    a=os.walk(x)
-    return(a)
+    return(ldir)
+    
+srcdeep=3
+deep=1
+srcdir="/home/voronkov/eclipse-workspace"
+srcdir=os.path.abspath(srcdir)
+dls=dirls(srcdir)
+#print(dls)
 
+print(dirls(dls[0]))
 
-docdir="//home//voronkov//eclipse-workspace"
-dls=dirls(docdir)
-print(dls)
-
-for r, d, f in dls:
-    print(r)
-    print(d)
-    print(f)
-    print("---")
+# bdir=[]
+# for n in dls:
+#     if os.path.isdir(n) and deep>0:
+#         bdir.append(dirls(n))
+#     deep = deep-1
+#         
+# print(bdir)
