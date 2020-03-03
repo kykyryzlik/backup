@@ -1,32 +1,48 @@
 import os
 
 def dirls(pdir):
-    if pdir:
+    if os.path.isdir(pdir):
         ldir=os.listdir(pdir)
-        for i, j in enumerate(ldir):
-            if os.path.isdir(os.path.join(pdir,j)):
-                ldir[i]=os.path.join(pdir,j)
-            else: 
-                ldir.pop[i]
-    #print(ldir[0])
-    #dirls(ldir[0])
-    
-
+    else:
+        print("dirls error")
     return(ldir)
+
+def fpath(sdir, ndir):
+#do full paths, need source path plus list with directory
+    fdir=[]
+    for i in ndir:
+        if os.path.isdir(os.path.join(sdir, i)):
+            fdir.append(os.path.join(sdir, i))
+    return(fdir)
     
-srcdeep=3
-deep=1
-srcdir="/home/voronkov/eclipse-workspace"
+
+def backuplist(blist):
+    xz=[]
+    for i in blist:
+        xz.append(i)
+    return(xz)
+
+srcdir="/home/voronkov/eclipse-workspace/1"
 srcdir=os.path.abspath(srcdir)
-dls=dirls(srcdir)
-#print(dls)
+deep=3
 
-print(dirls(dls[0]))
+    
+d=0
+rootdir=dirls(srcdir)
+blist=fpath(srcdir, rootdir)
+z=[]
+while d<deep:
+    for i, j in enumerate(blist):
+        x=dirls("/home/voronkov/eclipse-workspace/1/1d/a")
+        print(x)
+        y=fpath(j, x)
+#         print(y)
+        z=z+y
+    d=d+1
+    blist=z
+    
+print("blist:", blist, "\n", len(blist))
 
-# bdir=[]
-# for n in dls:
-#     if os.path.isdir(n) and deep>0:
-#         bdir.append(dirls(n))
-#     deep = deep-1
-#         
-# print(bdir)
+
+
+
