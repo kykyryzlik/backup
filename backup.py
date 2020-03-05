@@ -4,15 +4,18 @@ def dirls(pdir):
     if os.path.isdir(pdir):
         ldir=os.listdir(pdir)
     else:
-        print("dirls error")
+        print("input str or list")
     return(ldir)
 
-def fpath(sdir, ndir):
-#do full paths, need source path plus list with directory
+def fpath(sdirs):
+#do full paths, need source path list AND list with directory`s name
     fdir=[]
-    for i in ndir:
-        if os.path.isdir(os.path.join(sdir, i)):
-            fdir.append(os.path.join(sdir, i))
+    for src in sdirs:
+        if os.path.isdir(src):
+            ld=dirls(src)
+            for ndir in ld:
+                if os.path.isdir(os.path.join(src, ndir)):
+                    fdir.append(os.path.join(src, ndir))
     return(fdir)
     
 
@@ -22,27 +25,16 @@ def backuplist(blist):
         xz.append(i)
     return(xz)
 
-srcdir="/home/voronkov/eclipse-workspace/1"
-srcdir=os.path.abspath(srcdir)
-deep=3
+srcdir=["/home/voronkov/yandex-disk", "/home/voronkov/torrents"]
+
+y=fpath(srcdir)
+print(y, "\n", len(y))
+
+x=fpath(y)
+print(x, "\n", len(x))
 
     
-d=0
-rootdir=dirls(srcdir)
-blist=fpath(srcdir, rootdir)
-z=[]
-while d<deep:
-    for i, j in enumerate(blist):
-        x=dirls("/home/voronkov/eclipse-workspace/1/1d/a")
-        print(x)
-        y=fpath(j, x)
-#         print(y)
-        z=z+y
-    d=d+1
-    blist=z
+
     
-print("blist:", blist, "\n", len(blist))
-
-
 
 
