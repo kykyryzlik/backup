@@ -1,6 +1,8 @@
 import os
+import pandas as pd
 
 def dirls(pdir):
+# do list dir, need list of directories     
     dlist=[]
     flist=[]
     if os.path.isdir(pdir):
@@ -14,7 +16,7 @@ def dirls(pdir):
     
 
 def fpath(sdirs):
-#do full paths, need source path list AND list with directory`s name
+# do full paths, need source path list AND list with directory`s and files names
     fdir=[]
     ffil=[]
     for src in sdirs:
@@ -34,8 +36,10 @@ def fpath(sdirs):
 # srcdir=["/home/voronkov/yandex-disk", "/home/voronkov/torrents"]
 # srcdir=["/home/voronkov/disk_V"]
 #srcdir=["/home/voronkov/eclipse-workspace"]
-srcdir=["E:\dlna"]
-# srcdir="E:\dlna"
+# srcdir=["E:\dlna", "E:\downloads"]
+srcdir="E:\downloads"
+# srcdir=["E:\dlna"]
+# srcdir=["E:\downloads"]
 
 # sd=srcdir
 # n=0
@@ -46,11 +50,18 @@ srcdir=["E:\dlna"]
 # 
 # print(sd, "\n", len(sd))
 
-x,y=fpath(srcdir)
-# x,y=dirls(srcdir)
-print(x, "\n", len(x))
-print(y, "\n", len(y))
+########
+# x,y=fpath(srcdir)
+# print(x, "\n", len(x))
+# print(y, "\n", len(y))
 
-# print("\n\n", fpath(srcdir), "\n\n", type(fpath(srcdir)))
+alltree=os.walk(srcdir)
 
+
+for root, dirs, files in alltree:
+#     print(root, dirs, files)
+    if files:
+        print(root)
+
+# print(merge_data)
 
