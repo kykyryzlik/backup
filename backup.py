@@ -1,21 +1,15 @@
 import os
 
-def dirls(pdir, FileOrDir):
+def dirls(pdir):
     dlist=[]
     flist=[]
-    if os.path.isdir(pdir) and FileOrDir=='D':
+    if os.path.isdir(pdir):
         ldir=os.listdir(pdir)
         for i in ldir:
-            if os.path.isdir(os.path.join(pdir, i)):
+            if os.path.isdir(os.path.join(pdir, i))==True:
                 dlist.append(i)
-        return(dlist)
-    
-    elif os.path.isdir(pdir)==False and FileOrDir=='F':
-        lfil=os.listdir(pdir)
-        print("aaaaaaaaa", type(lfil))
-        for j in lfil:
-            #os.path.join(pdir, j)
-            flist.append(j)
+            elif os.path.isdir(os.path.join(pdir, i))==False:
+                flist.append(i)
     return(dlist, flist)
     
 
@@ -24,13 +18,10 @@ def fpath(sdirs):
     fdir=[]
     ffil=[]
     for src in sdirs:
-        ld=dirls(src, 'D')
+        ld,lf=dirls(src)
         for ndir in ld:
             fdir.append(os.path.join(src, ndir))
-        lf=dirls(src, 'F')
-        print(type(lf))
         for nfil in lf:
-            print("222222222222222")
             ffil.append(os.path.join(src, nfil))
     return(fdir, ffil)
 
@@ -42,8 +33,9 @@ def fpath(sdirs):
 
 # srcdir=["/home/voronkov/yandex-disk", "/home/voronkov/torrents"]
 # srcdir=["/home/voronkov/disk_V"]
-srcdir=["/home/voronkov/eclipse-workspace"]
-
+#srcdir=["/home/voronkov/eclipse-workspace"]
+srcdir=["E:\dlna"]
+# srcdir="E:\dlna"
 
 # sd=srcdir
 # n=0
@@ -55,9 +47,10 @@ srcdir=["/home/voronkov/eclipse-workspace"]
 # print(sd, "\n", len(sd))
 
 x,y=fpath(srcdir)
+# x,y=dirls(srcdir)
 print(x, "\n", len(x))
 print(y, "\n", len(y))
 
-
+# print("\n\n", fpath(srcdir), "\n\n", type(fpath(srcdir)))
 
 
