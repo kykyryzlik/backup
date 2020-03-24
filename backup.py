@@ -1,5 +1,4 @@
 import os
-import pandas as pd
 
 def dirls(pdir):
 # do list dir, need list of directories     
@@ -27,41 +26,50 @@ def fpath(sdirs):
             ffil.append(os.path.join(src, nfil))
     return(fdir, ffil)
 
-# def backuplist(blist):
-#     xz=[]
-#     for i in blist:
-#         xz.append(i)
-#     return(xz)
 
-# srcdir=["/home/voronkov/yandex-disk", "/home/voronkov/torrents"]
-# srcdir=["/home/voronkov/disk_V"]
-#srcdir=["/home/voronkov/eclipse-workspace"]
-# srcdir=["E:\dlna", "E:\downloads"]
-srcdir="E:\downloads"
-# srcdir=["E:\dlna"]
-# srcdir=["E:\downloads"]
 
-# sd=srcdir
-# n=0
-# while n<2:
-#     z=fpath(sd)
-#     sd=z
-#     n=n+1
+if os.name == 'nt':
+    srcdir=os.path.abspath("e:\dlna")
+    srcdirdeep=srcdir.count("\\")
+elif os.name == 'posix':
+    srcdir="~"
+
+deep=3
+adeep=deep-srcdirdeep
+print("now deep is:", srcdirdeep, "\n", "need deep:", deep, "\n-----\n", adeep, "\n-----")
+
+
+def tree(blist):
+    backuplist=[]
+    for dir_path, dir_names, file_names in os.walk(srcdir):
+        if  dir_path.count("\\") == srcdirdeep:
+            print(dir_path)
+#             backuplist.append(dir_path)
+        elif dir_path.count("\\") < deep and dir_names == []:
+            print("---2 ELIF---", dir_path, "---", dir_names)
+#         elif dir_path.count("\\") < adeep and dir_names != []:
+#             print("---3 ELIF---", dir_path, "---", dir_names)
+    return backuplist
+ 
+b=tree(srcdir)
+print(b)
+    
+    
+    
+###############
+# def countdown(num):
+#     print('Starting')
+#     while num > 0:
+#         yield num
+#         num -= 1
 # 
-# print(sd, "\n", len(sd))
-
-########
-# x,y=fpath(srcdir)
-# print(x, "\n", len(x))
-# print(y, "\n", len(y))
-
-alltree=os.walk(srcdir)
+# asd=countdown(10)
+# print(next(asd))
+# print(next(asd))
+# print("-------------")
+# for h in asd:
+#     print(h)
 
 
-for root, dirs, files in alltree:
-#     print(root, dirs, files)
-    if files:
-        print(root)
 
-# print(merge_data)
 
