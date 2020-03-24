@@ -31,28 +31,33 @@ def fpath(sdirs):
 if os.name == 'nt':
     srcdir=os.path.abspath("e:\dlna")
     srcdirdeep=srcdir.count("\\")
+#     print(srcdirdeep)
 elif os.name == 'posix':
     srcdir="~"
 
-deep=3
-adeep=deep-srcdirdeep
-print("now deep is:", srcdirdeep, "\n", "need deep:", deep, "\n-----\n", adeep, "\n-----")
+deep=2
+# print("now deep is:", srcdirdeep, "\n", "need deep:", deep, "\n-----\n", adeep, "\n-----")
 
 
 def tree(blist):
     backuplist=[]
     for dir_path, dir_names, file_names in os.walk(srcdir):
-        if  dir_path.count("\\") == srcdirdeep:
-            print(dir_path)
-#             backuplist.append(dir_path)
-        elif dir_path.count("\\") < deep and dir_names == []:
-            print("---2 ELIF---", dir_path, "---", dir_names)
-#         elif dir_path.count("\\") < adeep and dir_names != []:
-#             print("---3 ELIF---", dir_path, "---", dir_names)
+        if  dir_names == []:
+            dir_path_deep=dir_path.split(sep="\\")
+            print(dir_path_deep)
+            qwe=os.path.join(dir_path_deep[0], os.sep, dir_path_deep[1], dir_path_deep[2])
+            print(qwe)
+            backuplist.append(os.path.abspath(qwe))
+#dir_path.count("\\") < deep and
+#         elif dir_path.count("\\") < deep and dir_names != []:
+#             backuplist.append(os.path.abspath(dir_path))
+#         print(dir_path)
     return backuplist
  
 b=tree(srcdir)
-print(b)
+print("\n-----", len(b))
+for i in b:
+    print(i)
     
     
     
