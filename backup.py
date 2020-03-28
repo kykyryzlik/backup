@@ -1,31 +1,25 @@
 import os
 import configparser
 
-deep=1
-# if last simvol is / delete him
-srcdir="/home/kyk/wine/os/windows"
-srcdir=os.path.abspath(srcdir)
-srcdirdeep=srcdir.count(os.sep)
-
-def ReadOrCreateConfig(pathConfig):
+def ReadConfig():
     config = configparser.ConfigParser()
-#      NEED try construct
-    FullPath = os.path.abspath(os.path.join(pathConfig, "backup.cfg"))
-    if os.path.exists(FullPath):
-        srcdir=config.get("Settings", "BackupDir")
-        deep=config.get("Settings", "Deep")
+    FullPathConfig = os.path.join(os.getcwd(), "backup.cfg")
+    if  os.path.isfile(FullPathConfig):
+        config.read(FullPathConfig)
+        BackupDir=config.get("Settings", "BackupDir")
+        Deep=config.get("Settings", "Deep")
+        BackupDir=os.path.abspath(BackupDir)
     else:
         config.add_section("Settings")
-        config.set("Settings", "BackupDir", ".")
+        config.set("Settings", "BackupDir", os.getcwd())
         config.set("Settings", "Deep", "0")
-    ConfigFile=open(os.path.abspath(os.path.join(pathConfig, "backup.cfg")), "w", encoding="utf-8")
-    config.write(ConfigFile)
-    
-
-ReadOrCreateConfig(os.getcwd())
-
-
-
+        ConfigFile=open(FullPathConfig, "w", encoding="utf-8")
+        config.write(ConfigFile)
+        
+        BackupDir=config.get("Settings", "BackupDir")
+        Deep=config.get("Settings", "Deep")
+        
+    return(BackupDir, Deep)
 
 def tree(blist):
     backuplist=[]
@@ -35,6 +29,14 @@ def tree(blist):
         elif  dir_names == [] and  dir_path.count(os.sep) <= srcdirdeep+deep:
             backuplist.append(dir_path)
     return(backuplist)
+
+
+srcdir,deep = ReadConfig()
+srcdir=str(srcdir)
+deep=int(deep)
+print(type(srcdir), type(deep))
+srcdir=os.path.abspath(srcdir)
+srcdirdeep=srcdir.count(os.sep)
 
  
 b=tree(srcdir)
