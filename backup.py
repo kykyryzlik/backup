@@ -7,10 +7,22 @@ srcdir="/home/kyk/wine/os/windows"
 srcdir=os.path.abspath(srcdir)
 srcdirdeep=srcdir.count(os.sep)
 
-def createConfig(pathConfig):
-    configparser.ConfigParser().add_section("Defaults")
+def ReadOrCreateConfig(pathConfig):
+    config = configparser.ConfigParser()
+#      NEED try construct
+    FullPath = os.path.abspath(os.path.join(pathConfig, "backup.cfg"))
+    if os.path.exists(FullPath):
+        srcdir=config.get("Settings", "BackupDir")
+        deep=config.get("Settings", "Deep")
+    else:
+        config.add_section("Settings")
+        config.set("Settings", "BackupDir", ".")
+        config.set("Settings", "Deep", "0")
+    ConfigFile=open(os.path.abspath(os.path.join(pathConfig, "backup.cfg")), "w", encoding="utf-8")
+    config.write(ConfigFile)
+    
 
-createConfig(os.getcwd())
+ReadOrCreateConfig(os.getcwd())
 
 
 
