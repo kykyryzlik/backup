@@ -1,27 +1,31 @@
 import os
 import configparser
+import shutil
+import datetime
 
 def ReadConfig():
     config = configparser.ConfigParser()
-    FullPathConfig = os.path.join(os.getcwd(), "backup.cfg")
-    if  os.path.isfile(FullPathConfig):
-        config.read(FullPathConfig)
-        BackupDir=config.get("Settings", "BackupDir")
-        Deep=config.get("Settings", "Deep")
-        BackupDir=os.path.abspath(BackupDir)
+    NameFileConfig="backup.cfg"
+    FullPathConfig = os.getcwd()
+    FullPathConfigFile = os.path.join(FullPathConfig, NameFileConfig)
+    if  os.path.isfile(FullPathConfigFile):
+        config.read(FullPathConfigFile)
+        SrcDir = config.get("Settings", "SrcDir")
+        Deep = config.get("Settings", "Deep")
+        DstDir = config.get("Settings", "DstDir")
+        SrcDir=os.path.abspath(SrcDir)
     else:
         config.add_section("Settings")
-        config.set("Settings", "BackupDir", os.getcwd())
+        config.set("Settings", "SrcDir", os.getcwd())
         config.set("Settings", "Deep", "0")
-        ConfigFile=open(FullPathConfig, "w", encoding="utf-8")
+        config.set("Settings", "DstDir", os.getcwd())
+        ConfigFile=open(os.path.join(FullPathConfig, "backup.cfg.default"), "w", encoding="utf-8")
         config.write(ConfigFile)
-        
-        BackupDir=config.get("Settings", "BackupDir")
-        Deep=config.get("Settings", "Deep")
-        
-    return(BackupDir, Deep)
+        print("Please rename backup.cfg.default to backup.cfg and edit this")
+        exit()
+    return(SrcDir, Deep, DstDir)
 
-def tree(blist):
+def tree(blist): #ROOT WRONG
     backuplist=[]
     for dir_path, dir_names, file_names in os.walk(srcdir):
         if dir_path.count(os.sep) == srcdirdeep+deep:
@@ -30,20 +34,37 @@ def tree(blist):
             backuplist.append(dir_path)
     return(backuplist)
 
+def MakeArch(DstDir, SrcDir):
+#     ArchName = SrcDir.split(os.sep)[-1]
+    ArchName = SrcDir.split(os.sep)[-1]
+    print(ArchName)
+    ArchDate = str(datetime.datetime.now())
+    print(ArchDate)
+    shutil.make_archive(os.path.join(DstDir, ArchName), "zip", SrcDir)
 
-srcdir,deep = ReadConfig()
+### Read config
+srcdir,deep,dstdir = ReadConfig()
 srcdir=str(srcdir)
 deep=int(deep)
-print(type(srcdir), type(deep))
+dstdir=str(dstdir)
 srcdir=os.path.abspath(srcdir)
+dstdir=os.path.abspath(dstdir)
 srcdirdeep=srcdir.count(os.sep)
 
+### Make list of Backup Directories 
+backuplist=tree(srcdir)
+
+### Archive Directories from backuplist
+
+for nowbkp in backuplist:
+    MakeArch(dstdir, nowbkp)
  
-b=tree(srcdir)
-for i in b:
+ 
+
+for i in backuplist:
     print(i)
 
-print("--- len IS ", len(b))    
+print("--- len IS ", len(backuplist))    
     
     
     
