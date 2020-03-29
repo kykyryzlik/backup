@@ -38,9 +38,9 @@ def MakeArch(DstDir, SrcDir):
 #     ArchName = SrcDir.split(os.sep)[-1]
     ArchName = SrcDir.split(os.sep)[-1]
     print(ArchName)
-    ArchDate = str(datetime.datetime.now())
+    ArchDate = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
     print(ArchDate)
-    shutil.make_archive(os.path.join(DstDir, ArchName), "zip", SrcDir)
+    shutil.make_archive(os.path.join(DstDir, ArchDate, ArchName), "zip", SrcDir)
 
 ### Read config
 srcdir,deep,dstdir = ReadConfig()
