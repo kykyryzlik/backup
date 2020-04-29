@@ -2,6 +2,8 @@ import os
 import configparser
 import shutil
 import datetime
+import logging
+# logging.basicConfig(filename="sample.log", level=logging.INFO)
 
 def ReadConfig():
     config = configparser.ConfigParser()
@@ -10,90 +12,67 @@ def ReadConfig():
     FullPathConfigFile = os.path.join(FullPathConfig, NameFileConfig)
     if  os.path.isfile(FullPathConfigFile):
         config.read(FullPathConfigFile)
-        SrcDir = config.get("Settings", "SrcDir")
+        SrcDir = config.get("Settings", "DocumentDir")
+        DstDir = config.get("Settings", "BackupDir")
         Deep = config.get("Settings", "Deep")
-        DstDir = config.get("Settings", "DstDir")
         SrcDir=os.path.abspath(SrcDir)
     else:
         config.add_section("Settings")
-        config.set("Settings", "SrcDir", os.getcwd())
+        config.set("Settings", "DocumentDir", os.getcwd())
+        config.set("Settings", "BackupDir", os.getcwd())
         config.set("Settings", "Deep", "0")
-        config.set("Settings", "DstDir", os.getcwd())
         ConfigFile=open(os.path.join(FullPathConfig, "backup.cfg.default"), "w", encoding="utf-8")
         config.write(ConfigFile)
         print("Please rename backup.cfg.default to backup.cfg and edit this")
         exit()
-    return(SrcDir, Deep, DstDir)
+    return(SrcDir, DstDir, Deep)
 
-def tree(blist): #ROOT WRONG
+def tree(tree_srcdir,tree_deep): #ROOT WRONG
     backuplist=[]
-    for dir_path, dir_names, file_names in os.walk(srcdir):
-        if dir_path.count(os.sep) == srcdirdeep+deep:
+    srcdirdeep=tree_srcdir.count(os.sep)
+    tree_deep=int(tree_deep)
+    for dir_path, dir_names, file_names in os.walk(tree_srcdir):
+        if dir_path.count(os.sep) == srcdirdeep+tree_deep:
             backuplist.append(dir_path)
-        elif  dir_names == [] and  dir_path.count(os.sep) <= srcdirdeep+deep:
+        elif  dir_names == [] and  dir_path.count(os.sep) <= srcdirdeep+tree_deep:
             backuplist.append(dir_path)
     return(backuplist)
 
-def MakeArch(DstDir, SrcDir):
-#     ArchName = SrcDir.split(os.sep)[-1]
-    ArchName = SrcDir.split(os.sep)[-1]
-    print(ArchName)
+def MakeArch(MakeArch_SrcDir ,MakeArch_DstDir, MakeArch_BackupList):
     ArchDate = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
-    print(ArchDate)
-    shutil.make_archive(os.path.join(DstDir, ArchDate, ArchName), "zip", SrcDir)
+    MakeArch_DstDir = os.path.join(MakeArch_DstDir, ArchDate)
+    for nowbkp in MakeArch_BackupList:
+        base_name = nowbkp.replace(MakeArch_SrcDir, MakeArch_DstDir)
+        format = "zip"
+        root_dir = nowbkp
+#         base_dir = '' 
+#         verbose = ''
+#         dry_run = ''
+#         owner = ''
+#         group = ''
+#         logger = ''
+#         shutil.make_archive(base_name, format, root_dir, base_dir, verbose, dry_run, owner, group, logger)
+        shutil.make_archive(base_name, format, root_dir)
 
-### Read config
-srcdir,deep,dstdir = ReadConfig()
-srcdir=str(srcdir)
-deep=int(deep)
-dstdir=str(dstdir)
-srcdir=os.path.abspath(srcdir)
-dstdir=os.path.abspath(dstdir)
-srcdirdeep=srcdir.count(os.sep)
+def main_backup():
+# read form config
+    srcdir,dstdir,deep = ReadConfig()
 
-### Make list of Backup Directories 
-backuplist=tree(srcdir)
+# make list for backup 
+    backuplist=tree(srcdir, deep)
 
-### Archive Directories from backuplist
+# make archive
+    MakeArch(srcdir, dstdir, backuplist)
 
-for nowbkp in backuplist:
-    MakeArch(dstdir, nowbkp)
+#### 
+#     print("\n--- len IS ", len(backuplist))
+#     for i in backuplist:
+#         print(i)
+
+
+
+main_backup()
  
- 
 
-for i in backuplist:
-    print(i)
-
-print("--- len IS ", len(backuplist))    
-    
-    
-    
-    
-
-# def dirls(pdir):
-# # do list dir, need list of directories     
-#     dlist=[]
-#     flist=[]
-#     if os.path.isdir(pdir):
-#         ldir=os.listdir(pdir)
-#         for i in ldir:
-#             if os.path.isdir(os.path.join(pdir, i))==True:
-#                 dlist.append(i)
-#             elif os.path.isdir(os.path.join(pdir, i))==False:
-#                 flist.append(i)
-#     return(dlist, flist)
-#     
-# 
-# def fpath(sdirs):
-# # do full paths, need source path list AND list with directory`s and files names
-#     fdir=[]
-#     ffil=[]
-#     for src in sdirs:
-#         ld,lf=dirls(src)
-#         for ndir in ld:
-#             fdir.append(os.path.join(src, ndir))
-#         for nfil in lf:
-#             ffil.append(os.path.join(src, nfil))
-#     return(fdir, ffil)
 
 
