@@ -11,7 +11,7 @@ def ReadConfig():
     FullPathConfig = os.getcwd()
     FullPathConfigFile = os.path.join(FullPathConfig, NameFileConfig)
     if  os.path.isfile(FullPathConfigFile):
-        config.read(FullPathConfigFile)
+        config.read(FullPathConfigFile, encoding="utf-8")
         SrcDir = config.get("Settings", "DocumentDir")
         DstDir = config.get("Settings", "BackupDir")
         Deep = config.get("Settings", "Deep")
