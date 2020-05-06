@@ -3,6 +3,7 @@ import configparser
 import shutil
 import datetime
 import logging
+from os.path import isfile
 # logging.basicConfig(filename="sample.log", level=logging.INFO)
 
 def ReadConfig():
@@ -53,24 +54,43 @@ def tree(tree_srcdir,tree_deep,tree_exdir): #ROOT WRONG
                 backuplist.append(dir_path)
     return(backuplist)
 
-def MakeArch(MakeArch_SrcDir ,MakeArch_DstDir, MakeArch_BackupList):
-    ArchDate = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
+def MakeArch(MakeArch_SrcDir ,MakeArch_DstDir, MakeArch_BackupList, ArchDate):
+#     ArchDate = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
     MakeArch_DstDir = os.path.join(MakeArch_DstDir, ArchDate)
+#     if not os.path.isdir(MakeArch_DstDir):
+#         os.mkdir(MakeArch_DstDir)
+#     ArchiveLog=open(os.path.join(MakeArch_DstDir, 'archivelog-' + ArchDate + '.log'), 'a+', encoding='utf-8')
+#     with open(os.path.join(MakeArch_DstDir, 'archivelog-' + ArchDate + '.log'), 'a+') as ArchiveLog:
     for nowbkp in MakeArch_BackupList:
         base_name = nowbkp.replace(MakeArch_SrcDir, MakeArch_DstDir)
-        format = "zip"
         root_dir = nowbkp
-#         base_dir = '' 
-#         verbose = ''
-#         dry_run = ''
-#         owner = ''
-#         group = ''
-#         logger = ''
-#         shutil.make_archive(base_name, format, root_dir, base_dir, verbose, dry_run, owner, group, logger)
         print("backuping ...", base_name)
-        shutil.make_archive(base_name, format, root_dir)
+#         ArchiveLog.write(f'Backuping ... {base_name} \n')
+        MakeLog(MakeArch_DstDir, f'Backuping ... {base_name} \n')
+        try:
+            shutil.make_archive(base_name, "zip", root_dir)
+            MakeLog(MakeArch_DstDir, f'\tOK Archive {base_name} \n')
+#             ArchiveLog.write(f'\tOK Archive {base_name} \n')
+        except Exception:
+            print(f'kyExceptError base_name = {base_name}, root_dir =  {root_dir}')
+            MakeLog(MakeArch_DstDir, f'\tNOT OK Archive {base_name} \n')
+#             ArchiveLog.write(f'\tNOT OK Archive {base_name} \n')
+#     ArchiveLog.close()
+
+def MakeLog(MakeLog_DstDir, WhatWrite):
+    if not os.path.isdir(MakeLog_DstDir):
+        os.mkdir(MakeLog_DstDir)
+    with open(os.path.join(MakeLog_DstDir, 'archivelog.log'), 'a+') as ArchiveLog:
+        ArchiveLog.write(WhatWrite)
+    
+
+def MakeDateTime():
+    DT = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
+#     MakeArch_DstDir = os.path.join(MakeArch_DstDir, ArchDate)
+    return(DT)
 
 def main_backup():
+    datetime = MakeDateTime()
 # read form config
     srcdir,dstdir,deep,exdir = ReadConfig()
 # make list for backup 
@@ -78,7 +98,8 @@ def main_backup():
 #     ex_backuplist = ex_tree(backuplist, exdir)
 
 # make archive
-    MakeArch(srcdir, dstdir, backuplist)
+    MakeArch(srcdir, dstdir, backuplist, datetime)
+    MakeLog(dstdir, "Backup THE END")
     print("Backup THE END")
 #### 
 #     print("\n--- len IS ", len(backuplist))
