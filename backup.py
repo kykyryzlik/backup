@@ -32,50 +32,49 @@ def ReadConfig():
         exit()
     return(SrcDir, DstDir, Deep, ExDir)
 
-# def ex_tree(ex_tree_backuplist, ex_tree_exdir):
-#     ex_backuplist=[]
-#     for i in ex_tree_backuplist:
-#         if i != ex_tree_exdir:
-#             ex_backuplist.append(i)
-#         print(i, "---", ex_tree_exdir)
-#     return(ex_backuplist)
-
-def tree(tree_srcdir,tree_deep,tree_exdir): #ROOT WRONG
+def MakeTree(tree_srcdir,tree_deep,tree_excdir): #ROOT WRONG
     backuplist=[]
+    exclist = tree_excdir.split()
+#     print(exclist)
     srcdirdeep=tree_srcdir.count(os.sep)
     tree_deep=int(tree_deep)
-    for dir_path, dir_names, file_names in os.walk(tree_srcdir):
-        if dir_path.count(os.sep) == srcdirdeep+tree_deep:
-            if tree_exdir != dir_path:
-                backuplist.append(dir_path)
-        elif  dir_names == [] and  dir_path.count(os.sep) <= srcdirdeep+tree_deep:
-            if tree_exdir != dir_path:
-                backuplist.append(dir_path)
+    for dir_path, dir_names, files_names in os.walk(tree_srcdir):
+        for i in exclist:
+            if dir_path == i: 
+#                 print(f' exc {dir_path}')
+                dir_path=''
+            
+        if dir_path and dir_path.count(os.sep) == srcdirdeep+tree_deep:
+#             if tree_excdir != dir_path:
+#             print(f'1- dir_path   {dir_path}')
+            backuplist.append(dir_path)
+            for addfile in files_names:
+                backuplist.append(os.path.join(dir_path, addfile))
+#                 print(f'2- {os.path.join(dir_path, addfile)}')
+            
+        elif dir_path and dir_names == [] and  dir_path.count(os.sep) <= srcdirdeep+tree_deep:
+#             if tree_excdir != dir_path:
+            backuplist.append(dir_path)
+#             backuplist.append(os.path.join(dir_path, file_names))
+            
     return(backuplist)
 
 def MakeArch(MakeArch_SrcDir ,MakeArch_DstDir, MakeArch_BackupList, ArchDate):
-#     ArchDate = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
     MakeArch_DstDir = os.path.join(MakeArch_DstDir, ArchDate)
-#     if not os.path.isdir(MakeArch_DstDir):
-#         os.mkdir(MakeArch_DstDir)
-#     ArchiveLog=open(os.path.join(MakeArch_DstDir, 'archivelog-' + ArchDate + '.log'), 'a+', encoding='utf-8')
-#     with open(os.path.join(MakeArch_DstDir, 'archivelog-' + ArchDate + '.log'), 'a+') as ArchiveLog:
     for nowbkp in MakeArch_BackupList:
+        base_name_src = os.path.join(MakeArch_SrcDir, nowbkp)
         base_name = nowbkp.replace(MakeArch_SrcDir, MakeArch_DstDir)
         root_dir = nowbkp
-        print("backuping ...", base_name)
-#         ArchiveLog.write(f'Backuping ... {base_name} \n')
+#         print("backuping ...", base_name)
         try:
             shutil.make_archive(base_name, "zip", root_dir)
-            MakeLog(MakeArch_DstDir, f'Backuping ... {base_name} \n', ArchDate)
-            MakeLog(MakeArch_DstDir, f'\tOK Archive {base_name} \n', ArchDate)
-#             ArchiveLog.write(f'\tOK Archive {base_name} \n')
+            MakeLog(MakeArch_DstDir, f'Backuping... \n from \t {base_name_src} \n in {base_name} \n', ArchDate)
+            MakeLog(MakeArch_DstDir, f'OK Archive \n from \t {base_name_src} \n in {base_name} \n\n', ArchDate)
+            print(f'111 --- {root_dir}---{base_name_src} --- {base_name}')
         except Exception:
-#             print(f'kyExceptError base_name = {base_name}, root_dir =  {root_dir}')
-            MakeLog(MakeArch_DstDir, f'Backuping ... {base_name} \n', ArchDate, "ERRlog-")
-            MakeLog(MakeArch_DstDir, f'\tNOT OK Archive {base_name} \n', ArchDate, "ERRlog-")
-#             ArchiveLog.write(f'\tNOT OK Archive {base_name} \n')
-#     ArchiveLog.close()
+            MakeLog(MakeArch_DstDir, f'Backuping... \n from \t {base_name_src} \n in {base_name} \n', ArchDate, "ERRlog-")
+            MakeLog(MakeArch_DstDir, f'NOT OK Archive \n from \t {base_name_src} \n in {base_name} \n\n', ArchDate, "ERRlog-")
+            print(f'222 --- {root_dir}---{base_name_src} --- {base_name}')
 
 def MakeLog(MakeLog_DstDir, WhatWrite, MakeLog_DateTime, MakeLog_NameLog="archivelog-"):
     if not os.path.isdir(MakeLog_DstDir):
@@ -86,29 +85,27 @@ def MakeLog(MakeLog_DstDir, WhatWrite, MakeLog_DateTime, MakeLog_NameLog="archiv
 
 def MakeDateTime():
     DT = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
-#     MakeArch_DstDir = os.path.join(MakeArch_DstDir, ArchDate)
     return(DT)
 
 def main_backup():
+
+# get date and time
     datetime = MakeDateTime()
+
 # read form config
-    srcdir,dstdir,deep,exdir = ReadConfig()
+    srcdir,dstdir,deep,excdir = ReadConfig()
+
 # make list for backup 
-    backuplist=tree(srcdir, deep, exdir)
-#     ex_backuplist = ex_tree(backuplist, exdir)
+    backuplist=MakeTree(srcdir, deep, excdir)
+#      = MakeExcept(backuplist)
 
 # make archive
+#     print(backuplist)
     print(f"Backup START on {MakeDateTime()}")
     MakeLog(os.path.join(dstdir, datetime), f"Backup START on {MakeDateTime()} \n", datetime)
     MakeArch(srcdir, dstdir, backuplist, datetime)
     MakeLog(os.path.join(dstdir, datetime), f"Backup END on {MakeDateTime()} \n", datetime)
     print(f"Backup END on {MakeDateTime()}")
-#### 
-#     print("\n--- len IS ", len(backuplist))
-#     for i in backuplist:
-#         print(i)
-
-
 
 main_backup()
  
