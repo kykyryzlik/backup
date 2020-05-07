@@ -20,7 +20,6 @@ def ReadConfig():
         SrcDir=os.path.abspath(SrcDir)
         DstDir=os.path.abspath(DstDir)
         ExDir=os.path.abspath(ExDir)
-        print("------------------", ExDir)
     else:
         config.add_section("Settings")
         config.set("Settings", "DocumentDir", os.getcwd())
@@ -66,21 +65,22 @@ def MakeArch(MakeArch_SrcDir ,MakeArch_DstDir, MakeArch_BackupList, ArchDate):
         root_dir = nowbkp
         print("backuping ...", base_name)
 #         ArchiveLog.write(f'Backuping ... {base_name} \n')
-        MakeLog(MakeArch_DstDir, f'Backuping ... {base_name} \n')
         try:
             shutil.make_archive(base_name, "zip", root_dir)
-            MakeLog(MakeArch_DstDir, f'\tOK Archive {base_name} \n')
+            MakeLog(MakeArch_DstDir, f'Backuping ... {base_name} \n', ArchDate)
+            MakeLog(MakeArch_DstDir, f'\tOK Archive {base_name} \n', ArchDate)
 #             ArchiveLog.write(f'\tOK Archive {base_name} \n')
         except Exception:
-            print(f'kyExceptError base_name = {base_name}, root_dir =  {root_dir}')
-            MakeLog(MakeArch_DstDir, f'\tNOT OK Archive {base_name} \n')
+#             print(f'kyExceptError base_name = {base_name}, root_dir =  {root_dir}')
+            MakeLog(MakeArch_DstDir, f'Backuping ... {base_name} \n', ArchDate, "ERRlog-")
+            MakeLog(MakeArch_DstDir, f'\tNOT OK Archive {base_name} \n', ArchDate, "ERRlog-")
 #             ArchiveLog.write(f'\tNOT OK Archive {base_name} \n')
 #     ArchiveLog.close()
 
-def MakeLog(MakeLog_DstDir, WhatWrite):
+def MakeLog(MakeLog_DstDir, WhatWrite, MakeLog_DateTime, MakeLog_NameLog="archivelog-"):
     if not os.path.isdir(MakeLog_DstDir):
         os.mkdir(MakeLog_DstDir)
-    with open(os.path.join(MakeLog_DstDir, 'archivelog.log'), 'a+') as ArchiveLog:
+    with open(os.path.join(MakeLog_DstDir, MakeLog_NameLog + MakeLog_DateTime + '.log'), 'a+') as ArchiveLog:
         ArchiveLog.write(WhatWrite)
     
 
@@ -98,9 +98,11 @@ def main_backup():
 #     ex_backuplist = ex_tree(backuplist, exdir)
 
 # make archive
+    print(f"Backup START on {MakeDateTime()}")
+    MakeLog(os.path.join(dstdir, datetime), f"Backup START on {MakeDateTime()} \n", datetime)
     MakeArch(srcdir, dstdir, backuplist, datetime)
-    MakeLog(dstdir, "Backup THE END")
-    print("Backup THE END")
+    MakeLog(os.path.join(dstdir, datetime), f"Backup END on {MakeDateTime()} \n", datetime)
+    print(f"Backup END on {MakeDateTime()}")
 #### 
 #     print("\n--- len IS ", len(backuplist))
 #     for i in backuplist:
